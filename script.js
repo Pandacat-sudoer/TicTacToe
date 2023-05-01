@@ -1,7 +1,3 @@
-/*
-We store our game status element here to allow us to more easily 
-use it later on 
-*/
 const statusDisplay = document.querySelector('.game--status');
 let gameActive = true;
 let currentPlayer = "X";
@@ -19,37 +15,12 @@ const winningConditions = [
     [0, 4, 8],
     [2, 4, 6]
 ];
-/*
-We set the inital message to let the players know whose turn it is
-*/
+
 statusDisplay.innerHTML = currentPlayerTurn();
 
-function handleCellPlayed() {
-/*
-We will save the clicked html element in a variable for easier further use
-*/    
-    const clickedCell = clickedCellEvent.target;
-/*
-Here we will grab the 'data-cell-index' attribute from the clicked cell to identify where that cell is in our grid. 
-Please note that the getAttribute will return a string value. Since we need an actual number we will parse it to an 
-integer(number)
-*/
-    const clickedCellIndex = parseInt(
-      clickedCell.getAttribute('data-cell-index')
-    );
-/* 
-Next up we need to check whether the call has already been played, 
-or if the game is paused. If either of those is true we will simply ignore the click.
-*/
-    if (gameState[clickedCellIndex] !== "" || !gameActive) {
-        return;
-    }
-/* 
-If everything if in order we will proceed with the game flow
-*/    
-    handleCellPlayed(clickedCell, clickedCellIndex);
-
-    handleResultValidation();
+function handleCellPlayed(clickedCell, clickedCellIndex) {
+    gameState[clickedCellIndex] = currentPlayer;
+    clickedCell.innerHTML = currentPlayer;
 }
 
 function handlePlayerChange() {
@@ -64,10 +35,7 @@ let roundWon = false;
         let a = gameState[winCondition[0]];
         let b = gameState[winCondition[1]];
         let c = gameState[winCondition[2]];
-        if (a === '' || b === '' || c === '') {
-            continue;
-        }
-        if (a === b && b === c) {
+        if (a === b && b === c && a !== '') {
             roundWon = true;
             break
         }
@@ -77,48 +45,29 @@ if (roundWon) {
         gameActive = false;
         return;
     }
-/* 
-We will check weather there are any values in our game state array 
-that are still not populated with a player sign
-*/
+
     let roundDraw = !gameState.includes("");
     if (roundDraw) {
         statusDisplay.innerHTML = drawMessage();
         gameActive = false;
         return;
     }
-/*
-If we get to here we know that the no one won the game yet, 
-and that there are still moves to be played, so we continue by changing the current player.
-*/
+
     handlePlayerChange();
-currentPlayer = currentPlayer === "X" ? "O" : "X";
-    statusDisplay.innerHTML = currentPlayerTurn();
 }
 
-function handleCellClick() {
-/*
-We will save the clicked html element in a variable for easier further use
-*/    
+function handleCellClick(clickedCellEvent) {
+    
     const clickedCell = clickedCellEvent.target;
-/*
-Here we will grab the 'data-cell-index' attribute from the clicked cell to identify where that cell is in our grid. 
-Please note that the getAttribute will return a string value. Since we need an actual number we will parse it to an 
-integer(number)
-*/
+
     const clickedCellIndex = parseInt(
       clickedCell.getAttribute('data-cell-index')
     );
-/* 
-Next up we need to check whether the call has already been played, 
-or if the game is paused. If either of those is true we will simply ignore the click.
-*/
+
     if (gameState[clickedCellIndex] !== "" || !gameActive) {
         return;
     }
-/* 
-If everything if in order we will proceed with the game flow
-*/    
+    
     handleCellPlayed(clickedCell, clickedCellIndex);
     handleResultValidation();
 }
